@@ -21,7 +21,28 @@ class PenggunaController extends Controller
 
     public function store(Request $request)
     {
-        Pengguna::create($request->all());
+        // VALIDASI INPUT
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:penggunas,email',
+            'no_telepon' => 'required|string|max:15',
+            'alamat' => 'required|string|max:255',
+            'kata_sandi' => 'required|string|min:6',
+            'karyawan_id' => 'nullable|exists:karyawans,id',
+        ], [
+            'nama.required' => 'Nama pengguna wajib diisi.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah terdaftar.',
+            'no_telepon.required' => 'Nomor telepon wajib diisi.',
+            'alamat.required' => 'Alamat wajib diisi.',
+            'kata_sandi.required' => 'Kata sandi wajib diisi.',
+            'kata_sandi.min' => 'Kata sandi minimal 6 karakter.',
+        ]);
+
+        // SIMPAN DATA
+        Pengguna::create($validated);
+
         return redirect()->route('penggunas.index')->with('success', 'Pengguna berhasil ditambahkan');
     }
 
@@ -38,7 +59,27 @@ class PenggunaController extends Controller
 
     public function update(Request $request, Pengguna $pengguna)
     {
-        $pengguna->update($request->all());
+        // VALIDASI INPUT (email unik kecuali miliknya sendiri)
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:penggunas,email,' . $pengguna->id,
+            'no_telepon' => 'required|string|max:15',
+            'alamat' => 'required|string|max:255',
+            'kata_sandi' => 'nullable|string|min:6',
+            'karyawan_id' => 'nullable|exists:karyawans,id',
+        ], [
+            'nama.required' => 'Nama pengguna wajib diisi.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah terdaftar.',
+            'no_telepon.required' => 'Nomor telepon wajib diisi.',
+            'alamat.required' => 'Alamat wajib diisi.',
+            'kata_sandi.min' => 'Kata sandi minimal 6 karakter.',
+        ]);
+
+        // UPDATE DATA
+        $pengguna->update($validated);
+
         return redirect()->route('penggunas.index')->with('success', 'Pengguna berhasil diperbarui');
     }
 
@@ -49,8 +90,8 @@ class PenggunaController extends Controller
     }
 
     public function confirmDelete($id)
-{
-    $pengguna = Pengguna::findOrFail($id);
-    return view('penggunas.confirmDelete', compact('pengguna'));
-}
+    {
+        $pengguna = Pengguna::findOrFail($id);
+        return view('penggunas.confirmDelete', compact('pengguna'));
+    }
 }

@@ -23,7 +23,33 @@ class TransaksiController extends Controller
 
     public function store(Request $request)
     {
-        Transaksi::create($request->all());
+        // VALIDASI INPUT
+        $validated = $request->validate([
+            'pengguna_id'   => 'required|exists:penggunas,id',
+            'tiket_id'      => 'required|exists:tikets,id',
+            'jumlah_tiket'  => 'required|integer|min:1',
+            'total_harga'   => 'required|numeric|min:0',
+            'status'        => 'required|string|in:pending,berhasil,gagal',
+            'tanggal_bayar' => 'nullable|date'
+        ], [
+            'pengguna_id.required'  => 'Pengguna wajib dipilih.',
+            'pengguna_id.exists'    => 'Pengguna yang dipilih tidak valid.',
+            'tiket_id.required'     => 'Tiket wajib dipilih.',
+            'tiket_id.exists'       => 'Tiket yang dipilih tidak valid.',
+            'jumlah_tiket.required' => 'Jumlah tiket wajib diisi.',
+            'jumlah_tiket.integer'  => 'Jumlah tiket harus berupa angka.',
+            'jumlah_tiket.min'      => 'Jumlah tiket minimal 1.',
+            'total_harga.required'  => 'Total harga wajib diisi.',
+            'total_harga.numeric'   => 'Total harga harus berupa angka.',
+            'total_harga.min'       => 'Total harga tidak boleh negatif.',
+            'status.required'       => 'Status transaksi wajib diisi.',
+            'status.in'             => 'Status hanya boleh: pending, berhasil, atau gagal.',
+            'tanggal_bayar.date'    => 'Tanggal bayar harus berupa tanggal yang valid.'
+        ]);
+
+        // SIMPAN DATA
+        Transaksi::create($validated);
+
         return redirect()->route('transaksis.index')->with('success', 'Transaksi berhasil ditambahkan');
     }
 
@@ -41,7 +67,33 @@ class TransaksiController extends Controller
 
     public function update(Request $request, Transaksi $transaksi)
     {
-        $transaksi->update($request->all());
+        // VALIDASI INPUT SAAT UPDATE
+        $validated = $request->validate([
+            'pengguna_id'   => 'required|exists:penggunas,id',
+            'tiket_id'      => 'required|exists:tikets,id',
+            'jumlah_tiket'  => 'required|integer|min:1',
+            'total_harga'   => 'required|numeric|min:0',
+            'status'        => 'required|string|in:pending,berhasil,gagal',
+            'tanggal_bayar' => 'nullable|date'
+        ], [
+            'pengguna_id.required'  => 'Pengguna wajib dipilih.',
+            'pengguna_id.exists'    => 'Pengguna yang dipilih tidak valid.',
+            'tiket_id.required'     => 'Tiket wajib dipilih.',
+            'tiket_id.exists'       => 'Tiket yang dipilih tidak valid.',
+            'jumlah_tiket.required' => 'Jumlah tiket wajib diisi.',
+            'jumlah_tiket.integer'  => 'Jumlah tiket harus berupa angka.',
+            'jumlah_tiket.min'      => 'Jumlah tiket minimal 1.',
+            'total_harga.required'  => 'Total harga wajib diisi.',
+            'total_harga.numeric'   => 'Total harga harus berupa angka.',
+            'total_harga.min'       => 'Total harga tidak boleh negatif.',
+            'status.required'       => 'Status transaksi wajib diisi.',
+            'status.in'             => 'Status hanya boleh: pending, berhasil, atau gagal.',
+            'tanggal_bayar.date'    => 'Tanggal bayar harus berupa tanggal yang valid.'
+        ]);
+
+        // UPDATE DATA
+        $transaksi->update($validated);
+
         return redirect()->route('transaksis.index')->with('success', 'Transaksi berhasil diperbarui');
     }
 
@@ -52,8 +104,8 @@ class TransaksiController extends Controller
     }
 
     public function confirmDelete($id)
-{
-    $transaksi = Transaksi::findOrFail($id);
-    return view('transaksis.confirmDelete', compact('transaksi'));
-}
+    {
+        $transaksi = Transaksi::findOrFail($id);
+        return view('transaksis.confirmDelete', compact('transaksi'));
+    }
 }

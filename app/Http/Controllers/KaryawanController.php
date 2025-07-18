@@ -19,7 +19,24 @@ class KaryawanController extends Controller
 
     public function store(Request $request)
     {
-        Karyawan::create($request->all());
+        // VALIDASI INPUT
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'posisi' => 'required|string|max:100',
+            'jadwal_kerja' => 'required|string|max:255',
+            'no_telepon' => 'required|string|max:15',
+            'alamat' => 'required|string|max:255',
+        ], [
+            'nama.required' => 'Nama karyawan wajib diisi.',
+            'posisi.required' => 'Posisi karyawan wajib diisi.',
+            'jadwal_kerja.required' => 'Jadwal kerja wajib diisi.',
+            'no_telepon.required' => 'Nomor telepon wajib diisi.',
+            'alamat.required' => 'Alamat wajib diisi.',
+        ]);
+
+        // SIMPAN DATA
+        Karyawan::create($validated);
+
         return redirect()->route('karyawans.index')->with('success', 'Karyawan berhasil ditambahkan');
     }
 
@@ -35,7 +52,24 @@ class KaryawanController extends Controller
 
     public function update(Request $request, Karyawan $karyawan)
     {
-        $karyawan->update($request->all());
+        // VALIDASI INPUT
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'posisi' => 'required|string|max:100',
+            'jadwal_kerja' => 'required|string|max:255',
+            'no_telepon' => 'required|string|max:15',
+            'alamat' => 'required|string|max:255',
+        ], [
+            'nama.required' => 'Nama karyawan wajib diisi.',
+            'posisi.required' => 'Posisi karyawan wajib diisi.',
+            'jadwal_kerja.required' => 'Jadwal kerja wajib diisi.',
+            'no_telepon.required' => 'Nomor telepon wajib diisi.',
+            'alamat.required' => 'Alamat wajib diisi.',
+        ]);
+
+        // UPDATE DATA
+        $karyawan->update($validated);
+
         return redirect()->route('karyawans.index')->with('success', 'Karyawan berhasil diperbarui');
     }
 
@@ -46,8 +80,8 @@ class KaryawanController extends Controller
     }
 
     public function confirmDelete($id)
-{
-    $karyawan = Karyawan::findOrFail($id);
-    return view('karyawans.confirmDelete', compact('karyawan'));
-}
+    {
+        $karyawan = Karyawan::findOrFail($id);
+        return view('karyawans.confirmDelete', compact('karyawan'));
+    }
 }
